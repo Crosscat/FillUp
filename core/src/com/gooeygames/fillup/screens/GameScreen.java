@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
@@ -17,11 +18,15 @@ public class GameScreen implements Screen{
 	
 	List<Drawable> drawables;
 	Board board;
+	boolean restartFlag;
 
 	@Override
 	public void show() {
-		Drawable boardInst = new Board(BoardStateGenerator.generate(), 2, 50, 50);
-		board = (Board) boardInst;
+		initialize();
+	}
+	
+	private void initialize(){
+		board = new Board(BoardStateGenerator.generate(), 2, 50, 50);;
 		
 		drawables = new ArrayList<>();
 		drawables.add(board);
@@ -29,10 +34,12 @@ public class GameScreen implements Screen{
 
 	@Override
 	public void render(float delta) {
-		if(Gdx.input.isTouched()){
+		if(Gdx.input.isTouched() && !restartFlag){
 			Vector2 touchPos = new Vector2(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
 			
-			board.checkInput(touchPos);
+			restartFlag = board.checkInput(touchPos);
+		}else if (!Gdx.input.isTouched()){
+			restartFlag = false;
 		}
 		
 		for (Drawable drawable : drawables){
@@ -46,6 +53,14 @@ public class GameScreen implements Screen{
 			drawable.draw();
 		}
 		Renderer.instance.endDraw();
+		
+		if (Gdx.input.isKeyJustPressed(Keys.Q)){
+			restartFlag = true;
+		}
+		
+		if (restartFlag){
+			initialize();
+		}
 	}
 
 	@Override

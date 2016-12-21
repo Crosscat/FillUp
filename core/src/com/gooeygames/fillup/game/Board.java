@@ -1,5 +1,8 @@
 package com.gooeygames.fillup.game;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.gooeygames.fillup.rendering.Drawable;
@@ -7,6 +10,7 @@ import com.gooeygames.fillup.rendering.Drawable;
 public class Board extends Drawable{
 	
 	private Tile[][] tiles;
+	private List<Tile> tileList;
 	private Tile previousTile;
 	private int boardWidth, boardHeight;
 
@@ -20,10 +24,11 @@ public class Board extends Drawable{
 		this.scale = scale;
 		this.boardWidth = boardWidth;
 		this.boardHeight = boardHeight;
-		tiles = new Tile[boardWidth][boardHeight];
 	}
 	
 	public void createBoard(char[][] boardState){
+		tiles = new Tile[boardWidth][boardHeight];
+		tileList = new ArrayList<Tile>();
 		for (int i = 0; i < boardWidth; i++){
 			for (int j = 0; j < boardHeight; j++){
 				createTile(boardState[i][j], i, j);
@@ -40,36 +45,40 @@ public class Board extends Drawable{
 		t.setPoint(xCoord, yCoord);
 		t.setPosition(pos);
 		tiles[xCoord][yCoord] = t;
+		tileList.add(t);
 	}
 	
 	@Override
 	public void draw(){
-		for (int i = 0; i < boardWidth; i++){
-			for (int j = 0; j < boardHeight; j++){
-				tiles[i][j].draw();
-			}
-		}
+		tileList.forEach(t -> t.draw());
 	}
 	
 	@Override
 	public void update(float delta){
-		for (int i = 0; i < boardWidth; i++){
-			for (int j = 0; j < boardHeight; j++){
-				tiles[i][j].update(delta);
-			}
-		}
+		tileList.forEach(t -> t.update(delta));
 	}
 	
-	public void checkInput(Vector2 touchPos){
-		Tile touchedTile = getTileAtScreenPosition(touchPos);
-		if (touchedTile == null) {
-			return;
+	public boolean checkInput(Vector2 touchPos){
+		boolean newTile = touchTile(getTileAtScreenPosition(touchPos));
+		if (newTile){
+			if (allTouched()){
+				markAllTiles(Color.RED);
+				return true;
+			}
 		}
-		if (!areAdjacent(previousTile, touchedTile)) {
-			return;
+		return false;
+	}
+	
+	private boolean touchTile(Tile tile){
+		if (tile == null || tile.isTouched() || !areAdjacent(previousTile, tile)) {
+			return false;
 		}
-		touchedTile.setColor(Color.BLUE);
-		previousTile = touchedTile;
+		tile.touch();
+		if (previousTile != null){
+			previousTile.setColor(Color.BLUE);
+		}
+		previousTile = tile;
+		return true;
 	}
 	
 	public Vector2 screenToTileCoord(Vector2 pos){
@@ -102,9 +111,22 @@ public class Board extends Drawable{
 		
 		int xDiff = (int) (previousPos.x - newPos.x);
 		int yDiff = (int) (previousPos.y - newPos.y);
-		if (Math.abs(xDiff) == 1 ^ Math.abs(yDiff) == 1){
+		if ((Math.abs(xDiff) == 1 && Math.abs(yDiff) == 0) || (Math.abs(yDiff) == 1 && Math.abs(xDiff) == 0)){
 			return true;
 		}
 		return false;
+	}
+	
+	public boolean allTouched(){
+		for (Tile t : tileList){
+			if (!t.isTouched()){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public void markAllTiles(Color color){
+		tileList.forEach(t -> t.setColor(color));
 	}
 }

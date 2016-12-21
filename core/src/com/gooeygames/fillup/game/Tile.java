@@ -1,5 +1,6 @@
 package com.gooeygames.fillup.game;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.gooeygames.fillup.assets.TextureKey;
@@ -10,6 +11,7 @@ public class Tile extends AnimatedDrawable{
 	
 	public static final int DEFAULTSIZE = 32;
 	private int xPoint, yPoint;
+	private boolean touched;
 	
 	public Tile(){
 		this(1);
@@ -27,6 +29,15 @@ public class Tile extends AnimatedDrawable{
 	public void setPoint(int x, int y){
 		xPoint = x;
 		yPoint = y;
+	}
+	
+	public void touch(){
+		touched = true;
+		color = Color.RED;
+	}
+	
+	public boolean isTouched(){
+		return touched;
 	}
 
 	@Override
