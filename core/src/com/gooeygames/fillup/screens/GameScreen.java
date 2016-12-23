@@ -1,5 +1,6 @@
 package com.gooeygames.fillup.screens;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,22 +12,40 @@ import com.badlogic.gdx.math.Vector2;
 import com.gooeygames.fillup.assets.Textures;
 import com.gooeygames.fillup.game.Board;
 import com.gooeygames.fillup.game.BoardStateGenerator;
+import com.gooeygames.fillup.game.FillUp;
 import com.gooeygames.fillup.rendering.Drawable;
 import com.gooeygames.fillup.rendering.Renderer;
 
 public class GameScreen implements Screen{
 	
+	List<String> puzzles;
 	List<Drawable> drawables;
 	Board board;
-	boolean restartFlag;
+	boolean restartFlag, resetFlag, acceptTouch;
+	char[][] puzzle;
 
 	@Override
 	public void show() {
+		try {
+			puzzles = BoardStateGenerator.loadPuzzles("puzzles.txt");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		initialize();
 	}
 	
+	private String getRandomPuzzle(){
+		return puzzles.get(FillUp.random.nextInt(puzzles.size()));
+	}
+	
 	private void initialize(){
-		board = new Board(BoardStateGenerator.generate(), 2, 50, 50);;
+		puzzle = BoardStateGenerator.generate(getRandomPuzzle());
+		restartPuzzle();
+	}
+	
+	private void restartPuzzle(){
+		board = new Board(puzzle, 2, 50, 50);
 		
 		drawables = new ArrayList<>();
 		drawables.add(board);
@@ -34,12 +53,12 @@ public class GameScreen implements Screen{
 
 	@Override
 	public void render(float delta) {
-		if(Gdx.input.isTouched() && !restartFlag){
+		if(Gdx.input.isTouched() && acceptTouch){
 			Vector2 touchPos = new Vector2(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
 			
 			restartFlag = board.checkInput(touchPos);
 		}else if (!Gdx.input.isTouched()){
-			restartFlag = false;
+			acceptTouch = true;
 		}
 		
 		for (Drawable drawable : drawables){
@@ -57,9 +76,19 @@ public class GameScreen implements Screen{
 		if (Gdx.input.isKeyJustPressed(Keys.Q)){
 			restartFlag = true;
 		}
+		if (Gdx.input.isKeyJustPressed(Keys.R)){
+			resetFlag = true;
+		}
 		
-		if (restartFlag){
-			initialize();
+		if (restartFlag || resetFlag){
+			if (restartFlag){
+				initialize();
+			}else if (resetFlag){
+				restartPuzzle();
+			}
+			restartFlag = false;
+			resetFlag = false;
+			acceptTouch = false;
 		}
 	}
 

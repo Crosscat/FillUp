@@ -31,7 +31,9 @@ public class Board extends Drawable{
 		tileList = new ArrayList<Tile>();
 		for (int i = 0; i < boardWidth; i++){
 			for (int j = 0; j < boardHeight; j++){
-				createTile(boardState[i][j], i, j);
+				if (boardState[i][j] == '1'){
+					createTile(boardState[i][j], i, j);
+				}
 			}
 		}
 	}
@@ -128,5 +130,9 @@ public class Board extends Drawable{
 	
 	public void markAllTiles(Color color){
 		tileList.forEach(t -> t.setColor(color));
+	}
+	
+	public List<Tile> getTiles(){
+		return tileList;
 	}
 }

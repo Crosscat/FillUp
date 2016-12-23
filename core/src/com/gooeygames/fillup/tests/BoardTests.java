@@ -67,4 +67,21 @@ public class BoardTests {
 		Assert.assertEquals(board.getTile(0, 0), t);
 		Assert.assertNotEquals(board.getTile(0, 1), t);
 	}
+	
+	@Test
+	public void allTouched(){
+		board.getTiles().forEach(t -> t.touch());
+		Assert.assertEquals(true, board.allTouched());
+	}
+	
+	@Test
+	public void noneTouched(){
+		Assert.assertEquals(false, board.allTouched());
+	}
+	
+	@Test
+	public void someTouched(){
+		board.getTiles().get(0).touch();
+		Assert.assertEquals(false, board.allTouched());
+	}
 }

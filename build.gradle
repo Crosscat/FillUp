@@ -65,6 +65,7 @@ project(":core") {
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "net.dermetfan.libgdx-utils:libgdx-utils:0.13.3"
+        compile group: 'commons-io', name: 'commons-io', version: '2.5'
     }
 }
 
