@@ -16,6 +16,8 @@ import com.gooeygames.fillup.game.FillUp;
 import com.gooeygames.fillup.rendering.Drawable;
 import com.gooeygames.fillup.rendering.Renderer;
 
+import generation.Generator;
+
 public class GameScreen implements Screen{
 	
 	List<String> puzzles;
@@ -40,7 +42,8 @@ public class GameScreen implements Screen{
 	}
 	
 	private void initialize(){
-		puzzle = BoardStateGenerator.generate(getRandomPuzzle());
+		Generator generator = new Generator(6, 6, 5, 2);
+		puzzle = BoardStateGenerator.generate(generator.createPuzzle());
 		restartPuzzle();
 	}
 	
