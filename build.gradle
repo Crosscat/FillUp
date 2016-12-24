@@ -14,9 +14,8 @@ buildscript {
 allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
-
     version = '1.0'
-    ext {
+    ext { 
         appName = "fillup"
         gdxVersion = '1.9.4'
         roboVMVersion = '2.2.0'
@@ -66,6 +65,7 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "net.dermetfan.libgdx-utils:libgdx-utils:0.13.3"
         compile group: 'commons-io', name: 'commons-io', version: '2.5'
+        compile group: 'junit', name: 'junit', version: '4.+' 
     }
 }
 
