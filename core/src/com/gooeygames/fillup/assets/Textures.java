@@ -14,6 +14,7 @@ public class Textures {
 	
 	public static void load(){
 		textures.put(TextureKey.Panel, new Texture(Gdx.files.internal("textures/panel.png")));
+		textures.put(TextureKey.Cursor, new Texture(Gdx.files.internal("textures/cursor.png")));
 		isLoaded = true;
 	}
 	

@@ -13,6 +13,7 @@ public class Board extends Drawable{
 	private List<Tile> tileList;
 	private Tile previousTile;
 	private int boardWidth, boardHeight;
+	private Cursor cursor;
 
 	public Board(char[][] boardState, float scale, int xPos, int yPos){
 		this(boardState.length, boardState[0].length, scale, xPos, yPos);
@@ -31,15 +32,19 @@ public class Board extends Drawable{
 		tileList = new ArrayList<Tile>();
 		for (int i = 0; i < boardWidth; i++){
 			for (int j = 0; j < boardHeight; j++){
-				if (boardState[i][j] == '1'){
-					createTile(boardState[i][j], i, j);
-				}
+				createTile(boardState[i][j], i, j);
 			}
 		}
+		cursor = new Cursor();
+		cursor.setScale(scale);
+		cursor.setPosition(new Vector2(-100, -100));
 	}
 	
 	private void createTile(char c, int xCoord, int yCoord){
-		Tile t = new Tile(scale);
+		Tile t = getTile(c);
+		if (t == null) {
+			return;
+		}
 		float x = xCoord * scale * Tile.DEFAULTSIZE + position.x;
 		float y = yCoord * scale * Tile.DEFAULTSIZE + position.y;
 		Vector2 pos = new Vector2(x, y);
@@ -50,9 +55,19 @@ public class Board extends Drawable{
 		tileList.add(t);
 	}
 	
+	private Tile getTile(char c){
+		switch (c){
+		case '0':
+			return null;
+		default:
+			return new Tile(Character.getNumericValue(c), scale);
+		}
+	}
+	
 	@Override
 	public void draw(){
 		tileList.forEach(t -> t.draw());
+		cursor.draw();
 	}
 	
 	@Override
@@ -64,7 +79,7 @@ public class Board extends Drawable{
 		boolean newTile = touchTile(getTileAtScreenPosition(touchPos));
 		if (newTile){
 			if (allTouched()){
-				markAllTiles(Color.RED);
+				markAllTiles(Color.GOLD);
 				return true;
 			}
 		}
@@ -72,13 +87,11 @@ public class Board extends Drawable{
 	}
 	
 	private boolean touchTile(Tile tile){
-		if (tile == null || tile.isTouched() || !areAdjacent(previousTile, tile)) {
+		if (tile == null || tile.isComplete() || !areAdjacent(previousTile, tile)) {
 			return false;
 		}
 		tile.touch();
-		if (previousTile != null){
-			previousTile.setColor(Color.BLUE);
-		}
+		cursor.setPosition(tile.getPosition());
 		previousTile = tile;
 		return true;
 	}
@@ -121,7 +134,7 @@ public class Board extends Drawable{
 	
 	public boolean allTouched(){
 		for (Tile t : tileList){
-			if (!t.isTouched()){
+			if (!t.isComplete()){
 				return false;
 			}
 		}
